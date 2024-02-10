@@ -14,3 +14,4 @@ def get_vacancies_and_companies(employers):
             print(f"Ошибка получения данных по номеру работодателя {employer_id}. "
                   f"Код ошибки: {response.status_code}")
     return hh_data_list
+#commits

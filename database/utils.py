@@ -74,3 +74,4 @@ def insert_data():
                         (vacancy_name, salary, employer_id))
     conn.commit()
     conn.close()
+#commits

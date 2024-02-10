@@ -52,3 +52,5 @@ class DBManager:
                             ('%' + keyword + '%',))
                 answer = cur.fetchall()
         return answer
+
+#commit
