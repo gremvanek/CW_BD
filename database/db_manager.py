@@ -1,57 +1,54 @@
 import psycopg2
-from database.hh_vacansies import params_db
 
 
 class DBManager:
-
-    """Класс для работы с информацией из Базы Данных"""
-
     @staticmethod
     def get_companies_and_vacancies_count():
         """Получает список всех компаний и количество вакансий у каждой компании."""
-        with psycopg2.connect(dbname='HH_vacancy', **params_db) as conn:
+        with psycopg2.connect(database='cw_db', user='postgres', password='050305', host='localhost') as conn:
             with conn.cursor() as cur:
-                cur.execute('SELECT company_name, COUNT(vacancy_name) from vacancies GROUP BY company_name')
+                cur.execute(
+                    'SELECT employer_name, COUNT(vacancy_id) FROM '
+                    'vacancies JOIN employers ON vacancies.employer_id = employers.employer_id GROUP BY employer_name')
                 answer = cur.fetchall()
-        conn.close()
         return answer
 
     @staticmethod
     def get_all_vacancies():
         """Получает список всех вакансий"""
-        with psycopg2.connect(dbname='postgres', **params_db) as conn:
+        with psycopg2.connect(database='cw_db', user='postgres', password='050305', host='localhost') as conn:
             with conn.cursor() as cur:
-                cur.execute('SELECT * from vacancies')
+                cur.execute(
+                    'SELECT vacancies.vacancy_name, vacancies.salary, employers.employer_name FROM '
+                    'vacancies JOIN employers ON vacancies.employer_id = employers.employer_id')
                 answer = cur.fetchall()
-        conn.close()
         return answer
 
     @staticmethod
     def get_avg_salary():
         """Получает среднюю зарплату по вакансиям"""
-        with psycopg2.connect(dbname='postgres', **params_db) as conn:
+        with psycopg2.connect(database='cw_db', user='postgres', password='050305', host='localhost') as conn:
             with conn.cursor() as cur:
-                cur.execute('SELECT avg(salary) from vacancies')
+                cur.execute('SELECT avg(salary) FROM vacancies')
                 answer = cur.fetchall()
-        conn.close()
         return answer
 
     @staticmethod
     def get_vacancies_with_higher_salary():
         """Получает список всех вакансий, у которых зарплата выше средней по всем вакансиям"""
-        with psycopg2.connect(dbname='postgres', **params_db) as conn:
+        with psycopg2.connect(database='cw_db', user='postgres', password='050305', host='localhost') as conn:
             with conn.cursor() as cur:
-                cur.execute('SELECT vacancy_name from vacancies WHERE salary > (SELECT AVG(salary) from vacancies)')
+                cur.execute('SELECT vacancy_name FROM '
+                            'vacancies WHERE salary > (SELECT AVG(salary) FROM vacancies)')
                 answer = cur.fetchall()
-        conn.close()
         return answer
 
     @staticmethod
     def get_vacancies_with_keyword(keyword):
         """Получает список всех вакансий, в названии которых содержатся переданные в метод слова"""
-        with psycopg2.connect(dbname='postgres', **params_db) as conn:
+        with psycopg2.connect(database='cw_db', user='postgres', password='050305', host='localhost') as conn:
             with conn.cursor() as cur:
-                cur.execute(f"SELECT vacancy_name from vacancies WHERE vacancy_name LIKE '%{keyword}%'")
+                cur.execute("SELECT vacancy_name FROM vacancies WHERE LOWER(vacancy_name) LIKE LOWER(%s)",
+                            ('%' + keyword + '%',))
                 answer = cur.fetchall()
-        conn.close()
         return answer
